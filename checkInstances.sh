@@ -7,7 +7,7 @@ UNUSED_INSTANCES=()
 EC2_INSTANCES=$(aws ec2 describe-instances | grep '"PrivateIpAddress"' | sed -e 's/.\+: "\([^"]\+\)".*$/\1/g' | uniq)
 
 dbg_print () {
-  if [ -z "$DEBUGMODE"  ]; then
+  if [ ! -z "$DEBUGMODE"  ]; then
     echo $1
   fi
   return 1
