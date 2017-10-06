@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 DEBUGMODE=0 # Switch to 1 for verbose traces
+JENKINSWS="/home/jenkins/workspace"
 CURRENT_USER=$(whoami)
 CURRENT_IP=$(hostname -I)
 UNUSED_INSTANCES=()
@@ -18,20 +19,29 @@ dbg_print "CURRENT IP: $CURRENT_IP"
 
 for instance in $EC2_INSTANCES; do
   if [ $instance != $CURRENT_IP ]; then
+    INUSE=0
     dbg_print "=================================="
     echo "Analysing instance: $instance"
     dbg_print "=================================="
+    dbg_print "Analysing Jenkins Workspace..."
+    #checkdir=$(ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa jenkins@$instance find $JENKINSWS -maxdepth 0 2>&1)
+    #if [[ "$checkdir" != *"No such file"* ]] && [[ "$checkdir" != *"Permission denied"* ]]; then
+      lastmodified=$(ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa jenkins@$instance find $JENKINSWS -ctime -$NB_DAYS 2>&1)
+       if [[ "$lastmodified" != "" ]] && [[ "$lastmodified" != *"No such file"* ]] && [[ "$lastmodified" != *"Permission denied"* ]]; then
+        INUSE=1
+        dbg_print "-> Workspace has been used recently by a Jenkins job"
+        dbg_print "$lastmodified"
+        continue
+      fi
+    #fi
+    dbg_print "Analysing Last Connection Log..."
     lastlog=$(ssh -o StrictHostKeyChecking=no -i ~/.ssh/tombitnami.pem ec2-user@$instance last -F 2>&1)
-    #lastlog=$(<last.log)
     if [[ "$lastlog" == *"key verification failed"* ]]; then
       dbg_print "WARNING: SSH connection failed"
       break;
     fi
-    #dbg_print "Last Log:"
-    #dbg_print "$lastlog"
     CURRENTTIME=$(date +%s)
     ONEDAYTIME=86400
-    INUSE=0
     while read -r line; do
       dbg_print "---------------------------------------------------------------------------------------"
       if [[ "$line" == *"known hosts"* ]]; then continue; fi
