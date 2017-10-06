@@ -19,7 +19,7 @@ usage()
 {
 cat << EOF
         Usage: $PROGNAME [options]
-               $PROGNAME --aws-id <AWS_ACCESS_KEY_ID> --aws-key <AWS_SECRET_ACCESS_KEY> --aws-region <AWS_DEFAULT_REGION> --sys-ssh <FILENAME> --sys-usr <USERNAME>--nbdays <NB_DAYS>
+               $PROGNAME --aws-id <AWS_ACCESS_KEY_ID> --aws-key <AWS_SECRET_ACCESS_KEY> --aws-region <AWS_DEFAULT_REGION> --sys-ssh <FILENAME> --sys-usr <USERNAME> --nbdays <NB_DAYS>
 
         List the AWS instances that are not flagged as active anymore.
         This is based on 'last' log activity and jenkins workspace if used (ssh-jenkins option required).
