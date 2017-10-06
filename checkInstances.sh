@@ -1,5 +1,4 @@
 #!/usr/bin/bash
-DEBUGMODE=0 # Switch to 1 for verbose traces
 JENKINSWS="/home/jenkins/workspace"
 CURRENT_USER=$(whoami)
 CURRENT_IP=$(hostname -I)
@@ -8,7 +7,7 @@ UNUSED_INSTANCES=()
 EC2_INSTANCES=$(aws ec2 describe-instances | grep '"PrivateIpAddress"' | sed -e 's/.\+: "\([^"]\+\)".*$/\1/g' | uniq)
 
 dbg_print () {
-  if [ "$DEBUGMODE" == "1" ]; then
+  if [ -z "$DEBUGMODE"  ]; then
     echo $1
   fi
   return 1
