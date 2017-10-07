@@ -1,6 +1,6 @@
 # Bitnami CI Project
 
-This repository contains one prototype script resulting of the analysis of the project given by Bitnami to support the discovery of fleet machines that are not in use anymore in the development pipeline.
+This repository contains one prototype script resulting of the analysis of the project given by Bitnami to support the discovery of fleet machines that are not in use anymore in the development pipeline. Alongside is provided a corresponding Jenkins job configuration file to ease the integration and the scheduling of that tool.
 
 ## Introduction
 Bitnami uses many clouds to support their development, tests, build and release strategies. The actual infrastructure, as well as development and test and other integration and release tools in use are unknown. This simplified exercise does not require in-depth knowledge of the latter and assumptions need to be addressed. As a result, several improvements could be suggested to better the script efficiency.
@@ -20,7 +20,7 @@ Improvement Suggestions:
 - All Linux distributions and other Operating Systems (if any) should be covered and tested.
 
 ### Coding Management System (CMS)
-Any project should use a CMS to version-control its ressources.
+Any project should use a CMS to version-control its resources.
 
 Requirements:
 - Code Management System: GIT via github will store the project code and documentation
@@ -28,10 +28,10 @@ Requirements:
 Assumptions:
 - The repository is **exposed as public** to avoid spending extra costs for this exercise. As a result, no credentials are needed to pull the project anywhere. No sensitive data is stored in this repository.
 - **No formal release process** is in place to deploy the script, i.e. no use of tagging or branches.
-- **No directory structure** is required. Only one script and a README file does not require any more complex file organisation strategy.
+- **No formal directory structure** is required. Only one script, a README file and a Jenkins job config file do not require any more complex file organisation strategy.
 
 Improvements:
-- The Repository should be private if sensitive data gets stored. Otherwise, such an exposure could be valuable to the company to bring attention to its engineering department.
+- The Repository should be private if sensitive data gets stored. Otherwise, such an exposure could be valuable to the company if open-sourcing is an option.
 - This script would need to be integrated to any relevant repository and not held separate from the rest of the automation toolchain. This is to reduce inter-dependency issues with complementary tools.
 - A Release process should be in place to tag stable versions every time a significant milestone is passed.
 
@@ -44,23 +44,27 @@ Requirements:
 
 Assumptions:
 - **No other deployment or provisioning methods are in place**
-- **ec2-user can be used as the system account** to run remote ssh commands on the EC2 instances.
 - **AWS API can be used** to run admin aws commands to discover VM instances. In this case, the only command that will be used is *describe-instances*. This requires the *AWS Shell* to be installed on the instance where the script will be run from. 
 
 Improvements:
-- Other deployment and provisioning tools such as Docker or chef/puppet could be used on exisiting instances. They could be used as an extra criteria to detect the use of the machine by a developper/tester. Relevant discovery methods should be added to cover those cases.
-- ec2-user is not secure enough as it could access and sudo all instances by default. A dedicated user should be used instead to limit the commands that could be run.
+- Other deployment and provisioning tools such as Docker or chef/puppet may be used on exisiting instances. They could be used as an extra criteria to detect the use of an instance by a developer/tester. Relevant discovery methods should be added to cover those cases.
 
 ### Criteria On Obsolescence
-Criteria needs to be established to detect whether a running VM instance is being used or not by a developper.
+Criteria needs to be established to detect whether a running VM instance is being used or not by a developer.
 
 Requirements:
 - none
 
 Assumptions:
-- **Connection logs** keep trace of every time a developper connects to the machine. By analysing the logs from the *last* command, it is possible to know if a user is still connected or when was the last connection made.
-- **Jenkins Slaves could be running on the machine**: Instead of logging onto the instances, developpers could use those machines as Jenkins slave nodes to build/test/deploy their projects. Checking the last time those projects ran can help determine if an instance is still in use.
+- **Connection logs** keep trace of every time a developer connects to the machine. By analysing the logs from the *last* command, it is possible to know if a user is still connected or when was the last connection made.
+- **Jenkins Slaves could be running on the machine**: Instead of logging onto the instances, developers could use those machines as Jenkins slave nodes to build/test/deploy their projects. Checking the last time those projects ran can help determine if an instance is still in use.
 - The **number of days** an instance has not been used is chosen as a mechanism to detect machines that need to be flagged as *not in use* anymore.
+
+Improvements:
+- As highlighted in the previous section, other tools may be used by developers that could be useful to detect any activity: VM Management tools or Provisioning tools may have APIs that could be used to detect whether the instance is still in use.
+- Listening ports should be taken into account to verify if any other instances are trying to connect to the instances. Some other processes may be running for test purposes that are not taken into account by the current scenarios
+- Analysing and keeping track of running processes would be an efficient indicator of any recent activity. A refined list of what is meant by 'active processes' could be maintained over time to refine this criteria.
+
 
 ### Script Coding
 Requirements:
@@ -129,7 +133,7 @@ Extra Options:
 The script will list all the AWS instances that are not flagged as active anymore. This will be output under the trace *THESE INSTANCES MAY NEED TO BE DECOMMISSIONED*
 This is based on 'last' log activity and jenkins workspace if used (ssh-jenkins option required).
 
-Example of Output (non-verbose)
+Example of Output (*non-verbose*):
 
 ```
 Analysing instance: xxx.xx.xx.43
@@ -139,7 +143,7 @@ ip-xxx-xx-xx-43.eu-west-1.compute.internal (xxx.xx.xx.43)
 ip-xxx-xx-x-xx.eu-west-1.compute.internal (xxx.xx.x.73)
 ```
 
-Example of Output (verbose)
+Example of Output (*verbose*):
 
 ```
 URRENT USER: jenkins
@@ -165,37 +169,37 @@ Analysing instance: xxx.xx.x.73
 Analysing Jenkins Workspace...
 Analysing Last Connection Log...
 ---------------------------------------------------------------------------------------
-LINE: dev1 pts/0 92.169.47.110 Fri Oct 6 14:48:39 2017 - Fri Oct 6 14:48:43 2017 (00:00)
+LINE: dev1 pts/0 xx.xxx.xx.110 Fri Oct 6 14:48:39 2017 - Fri Oct 6 14:48:43 2017 (00:00)
 LASTCONNECTIONUSER: dev1
 LASTCONNECTIONTIME: Fri Oct 6 14:48:43 2017
 LASTTIME: 1507301323
 DIFFTIME: -74167
 ---------------------------------------------------------------------------------------
-LINE: dev1 pts/0 92.169.47.110 Wed Oct 4 19:30:48 2017 - Wed Oct 4 19:30:51 2017 (00:00)
+LINE: dev1 pts/0 xx.xxx.xx.110 Wed Oct 4 19:30:48 2017 - Wed Oct 4 19:30:51 2017 (00:00)
 LASTCONNECTIONUSER: dev1
 LASTCONNECTIONTIME: Wed Oct 4 19:30:51 2017
 LASTTIME: 1507145451
 DIFFTIME: 81705
 ---------------------------------------------------------------------------------------
-LINE: dev1 pts/0 92.169.47.110 Wed Oct 4 19:10:27 2017 - Wed Oct 4 19:10:58 2017 (00:00)
+LINE: dev1 pts/0 xx.xxx.xx.110 Wed Oct 4 19:10:27 2017 - Wed Oct 4 19:10:58 2017 (00:00)
 LASTCONNECTIONUSER: dev1
 LASTCONNECTIONTIME: Wed Oct 4 19:10:58 2017
 LASTTIME: 1507144258
 DIFFTIME: 82898
 ---------------------------------------------------------------------------------------
-LINE: ec2-user pts/0 172.31.4.149 Wed Oct 4 19:08:14 2017 - Wed Oct 4 19:08:24 2017 (00:00)
+LINE: ec2-user pts/0 xxx.xx.x.149 Wed Oct 4 19:08:14 2017 - Wed Oct 4 19:08:24 2017 (00:00)
 LASTCONNECTIONUSER: ec2-user
 LASTCONNECTIONTIME: Wed Oct 4 19:08:24 2017
 LASTTIME: 1507144104
 DIFFTIME: 83052
 ---------------------------------------------------------------------------------------
-LINE: dev1 pts/0 92.169.47.110 Wed Oct 4 19:01:23 2017 - Wed Oct 4 19:01:27 2017 (00:00)
+LINE: dev1 pts/0 xx.xxx.xx.110 Wed Oct 4 19:01:23 2017 - Wed Oct 4 19:01:27 2017 (00:00)
 LASTCONNECTIONUSER: dev1
 LASTCONNECTIONTIME: Wed Oct 4 19:01:27 2017
 LASTTIME: 1507143687
 DIFFTIME: 83469
 ---------------------------------------------------------------------------------------
-LINE: ec2-user pts/0 92.169.47.110 Wed Oct 4 18:57:22 2017 - Wed Oct 4 19:00:39 2017 (00:03)
+LINE: ec2-user pts/0 xx.xxx.xx.110 Wed Oct 4 18:57:22 2017 - Wed Oct 4 19:00:39 2017 (00:03)
 LASTCONNECTIONUSER: ec2-user
 LASTCONNECTIONTIME: Wed Oct 4 19:00:39 2017
 LASTTIME: 1507143639
@@ -212,9 +216,9 @@ ALL INSTANCES SEEM IN USE
 
 
 ### Integrate it to Jenkins
-Place the whole '*Check Instances*'' directory in the *jobs* directory (usually */var/lib/jenkins/jobs/*) on Jenkins master, then *Reload Configuration from Disk* in the *Manage Jenkins* section.
+Place the whole '*Check Instances*' directory in the *jobs* directory (usually */var/lib/jenkins/jobs/*) on Jenkins master, then *Reload Configuration from Disk* in the *Manage Jenkins* section.
 
-It will create the '*Check Instances*'' job for you that you need to edit for:
+It will create the '*Check Instances*' job for you that you need to edit for:
 - Filling in default values of parameters (required if regular automatic scheduling is planned)
 - Replacing the **[CUSTOMFIELD]** by the proper values needed by the script as described in the above sections.
 - Remove the *--verbose* parameter is not required (should not be required for automatic scheduling)
@@ -236,16 +240,16 @@ sudo yum update -y
 sudo yum install git
 #Install JAVA
 sudo yum install java
-#Install and run Jenkins
-sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo
-sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
-sudo yum install jenkins -y
-sudo service jenkins start
 #Install PIP (required to install AWS shell)
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 sudo python get-pip.py
 #Install AWS-SHELL
 sudo pip install aws-shell
+#Install and run Jenkins
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+sudo yum install jenkins -y
+sudo service jenkins start
 ```
 - In jenkins, install the following plugins:
   - **Git Plugin** (used to pull the bitnami scripts from github)
@@ -264,7 +268,7 @@ chown jenkins:jenkins /var/lib/jenkins/.ssh/<SSHKEY_FILENAME>
 ```
 
 
-#### Setting up a couple of developper instances
+#### Setting up a couple of developer instances
 In AWS Console:
 - Create two new default Red Hat Enterprise instances
 - Create two new security key-pairs for a dev user, then extract public key from downloaded pem file by locally running: ssh-keygen -y
@@ -280,7 +284,7 @@ chmod 600 .ssh/authorized_keys
 
 Do the following to add a slave node to one of the instances only:
 In AWS Console:
-- Create a new security key-pair for jenkins user (that we would call *jenkins.pem*, then extract public key from downloaded pem file by locally running: ssh-keygen -y
+- Create a new security key-pair for jenkins user (that we would call *jenkins.pem*), then extract public key from downloaded pem file by locally running: ssh-keygen -y
 
 From Local machine
 - Copy the private key to Jenkins Server
@@ -325,13 +329,13 @@ On Jenkins HTTP Server:
 
 Two sets of tests could be envisaged:
 - From the above setup, the script will run to verify both Jenkins workspace and *last* connection log on one dev instance, and only the *last* connection log on the other instance.
-- Test the criteria detection (number of days without changes) by modifying the file status of Jenkins workspace as well as fake a change in the Last system command to have a variety of test cases.
+- Test the criteria detection (number of days without changes) by modifying the file status of Jenkins workspace as well as fake a change in the *last* system command to have a variety of test cases.
 
 #### Locally:
-As long as *AWS Shell* is installed on a Linux environment with bash installed, please refer to the *How to Use* section to test this script.
+As long as *AWS Shell* is installed on a Linux environment with bash installed, please refer to the "*How to Use*" section to test this script.
 
 #### As Part of Jenkins CI:
-Run the *Check Instances* job wihtout forgetting to activate the *verbose* parameter.
+Run the '*Check Instances*' job wihtout forgetting to activate the *verbose* parameter.
 
 
 ## Authors
