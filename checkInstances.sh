@@ -175,8 +175,8 @@ done
 
 # Display hostname and ip of instances that were flagged as "not in use anymore".
 if [ -n "$UNUSED_INSTANCES" ]; then
-  echo "THESE MACHINES NEED TO BE DECOMMISSIONED:"
+  echo "THESE INSTANCES MAY NEED TO BE DECOMMISSIONED:"
   printf '%s\n' "${UNUSED_INSTANCES[@]}"
 else
-  echo "ALL MACHINES ARE IN USE"
+  echo "ALL INSTANCES SEEM IN USE"
 fi
