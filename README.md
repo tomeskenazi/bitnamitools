@@ -48,11 +48,11 @@ Requirements:
 - no explicit requirement
 
 Assumptions:
-- **No other deployment or provisioning methods are in place**
+- **No other deployment or provisioning methods are in place**: only AWS is being used.
 - **AWS API can be used** to run admin aws commands to discover VM instances. In this case, the only command that will be used is *describe-instances*. This requires the *AWS Shell* to be installed on the instance where the script will be run from. 
 
 Improvements:
-- Other deployment and provisioning tools such as Docker or chef/puppet may be used on exisiting instances. They could be used as an extra criteria to detect the use of an instance by a developer/tester. Relevant discovery methods should be added to cover those cases.
+- Other deployment and provisioning tools such as Docker or Chef/Puppet may be used on exisiting instances. They could be used as an extra criteria to detect the use of an instance by a developer/tester. Relevant discovery methods should be added to cover those cases.
 
 ### Criteria On Obsolescence
 Criteria needs to be established to detect whether a running VM instance is being used or not by a developer.
@@ -82,7 +82,7 @@ Assumptions:
 - The script is **version-controlled**. For traceability reasons and easy rollback, this script should not be directly integrated to a CI tool, but kept external. It is also easier to expose it as an open-source project if desired.
 
 Improvements:
-- This script needs to be made more robust against errors raised by the remote ssh commands used throughout. Although that script was tested and some errors have been anticipated, it is probably not covering all error cases. For such a sensitive script, more effort should be put on this side.
+- This script needs to be made more robust against errors raised by the aws shell and the remote ssh commands used throughout. Although that script was tested and some errors have been anticipated, it is probably not covering all error cases. For such a sensitive script, more effort should be put on this side.
 - This script should be amended to run on any type of OS and distributions used at Bitnami.
 
 
@@ -94,15 +94,15 @@ Requirements:
 Assumptions:
 - **Jenkins** is used as the CI tool of choice at Bitnami.
 - This script **runs on Jenkins master** instance to avoid interacting with slave nodes. This avoids deploying the *AWS shell* on other instances.
-- The following plugins will need to be installed: **GIT Plugin** and **SSH Slaves Plugin**. This is to allow Jenkins to pull the latest script from the master branch
+- The following plugins will need to be installed: **GIT Plugin** and **SSH Slaves Plugin**. This is to allow Jenkins to pull the latest script from the master branch and connect to slave nodes via ssh.
 - **Jenkins job is kept simple**: to avoid complicating version-controlling, Jenkins jobs should be kept simple. In this case, source control pulls the latest code available in the CMS, the build steps are limited to running the script, and post-build steps are inexistent.
 
 Improvements:
 - Other CI tools (such as Travis or CircleCI) should be considered if used at Bitnami.
 - This script should be scheduled to run on a regular basis, weekly for instance.
 - The Jenkins job could be enriched by:
-  - Adding post-build alerts (email notification for instance) to notify a sysadmin of the machines flagged as 'not used anymore'.
-  - Keeping track of flagged machines to make sure they are not used anymore. For instance, after having been flagged three times, they could automatically be suspended and a notification sent to or sysadmin to deal with the final decommissioning phase or to the last users who logged into the flagged instances before it could be fully decommisionned
+  - Adding post-build alerts (e.g. email notification) to notify a sysadmin of the machines flagged as 'not used anymore'.
+  - Keeping track of flagged machines to make sure they are not used anymore. For instance, after having been flagged three times, they could automatically be suspended and a notification sent to a sysadmin to deal with the final decommissioning phase or to the last users who logged into the flagged instances before it could be fully decommissioned
   - Keeping track of the hostnames, logged-in users, and the number of times VM instances have been flagged as unused: this is useful to automate any decommissioning and generate statistics (number of instances flagged, decommissioned, new instances, types of machines, etc.). This could be achieved by connecting to an external database for instance.
 - Automatically decommissioning these instances are not recommended without making sure all acceptable criteria have been covered. Such a feature could be an extension of this script or another dedicated script. In all cases, a final warning notification should be sent to a sysadmin before the script wipes the instances for good.
 
