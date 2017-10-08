@@ -56,11 +56,12 @@ Requirements:
 - none
 
 Assumptions:
-- **Connection logs** keep trace of every time a developer connects to the machine. By analysing the logs from the *last* command, it is possible to know if a user is still connected or when was the last connection made.
+- **Connection logs** keep trace of every time a developer logged into the machine. By analysing the logs from the *last* command, it is possible to know if a user is still connected or when was the last connection made.
 - **Jenkins Slaves could be running on the machine**: Instead of logging onto the instances, developers could use those machines as Jenkins slave nodes to build/test/deploy their projects. Checking the last time those projects ran can help determine if an instance is still in use.
 - The **number of days** an instance has not been used is chosen as a mechanism to detect machines that need to be flagged as *not in use* anymore.
 
 Improvements:
+- Detecting a connection to the instance could be made more robust by analysing extra system logs such as * /var/log/secure* to extract ssh daemon information for instance.
 - As highlighted in the previous section, other tools may be used by developers that could be useful to detect any activity: VM Management tools or Provisioning tools may have APIs that could be used to detect whether the instance is still in use.
 - Listening ports should be taken into account to verify if any other instances are trying to connect to the instances. Some other processes may be running for test purposes that are not taken into account by the current scenarios
 - Analysing and keeping track of running processes would be an efficient indicator of any recent activity. A refined list of what is meant by 'active processes' could be maintained over time to refine this criteria.
