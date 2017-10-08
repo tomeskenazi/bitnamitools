@@ -205,12 +205,6 @@ LASTCONNECTIONTIME: Wed Oct 4 19:00:39 2017
 LASTTIME: 1507143639
 DIFFTIME: 83517
 ---------------------------------------------------------------------------------------
-LINE: reboot system boot 3.10.0-693.el7.x Wed Oct 4 18:43:35 2017 - Fri Oct 6 18:12:36 2017 (1+23:29)
-LASTCONNECTIONUSER: reboot
-LASTCONNECTIONTIME: Fri Oct 6 18:12:36 2017
-LASTTIME: 1507313556
-DIFFTIME: -86400
----------------------------------------------------------------------------------------
 ALL INSTANCES SEEM IN USE
 ```
 
@@ -231,7 +225,7 @@ This assumes there is no existing AWS environment and everything needs to be set
 #### Setting up the Jenkins Master instance
 This instance will be used to run the script.
 
-- Create a new instance from AWS Console, choose a default Red Hat Enterprise Release
+- Create a new instance from AWS Console, choose a default Red Hat Enterprise Release and set the security group to allow HTTP, SSH and custom 8080 ports open to secure IPs of your choice, as well as all connections to current VPC.
 - Log on to the machine and run:
 ```
 # Update System Packages
@@ -270,7 +264,7 @@ chown jenkins:jenkins /var/lib/jenkins/.ssh/<SSHKEY_FILENAME>
 
 #### Setting up a couple of developer instances
 In AWS Console:
-- Create two new default Red Hat Enterprise instances
+- Create two new default Red Hat Enterprise instances and set the security group to allow SSH connections open to secure IPs of your choice, as well as all connections to current VPC.
 - Create two new security key-pairs for a dev user, then extract public key from downloaded pem file by locally running: ssh-keygen -y
 - Log onto the new instances, run the following and fill in the *authorized_keys* file:
 ```

@@ -19,7 +19,7 @@ usage()
 {
 cat << EOF
         Usage: $PROGNAME [options]
-               $PROGNAME --aws-id <AWS_ACCESS_KEY_ID> --aws-key <AWS_SECRET_ACCESS_KEY> --aws-region <AWS_DEFAULT_REGION> --sys-ssh <FILENAME> --sys-usr <USERNAME> --nbdays <NB_DAYS>
+               $PROGNAME --aws-id=<AWS_ACCESS_KEY_ID> --aws-key=<AWS_SECRET_ACCESS_KEY> --aws-region=<AWS_DEFAULT_REGION> --sys-ssh=<FILENAME> --sys-usr=<USERNAME> --nbdays=<NB_DAYS>
 
         List the AWS instances that are not flagged as active anymore.
         This is based on 'last' log activity and jenkins workspace if used (ssh-jenkins option required).
@@ -51,17 +51,17 @@ while true; do
          ;;
       --aws-key)
          shift
-         AWS_SECRET_ACCESS_KEY="$1"
+         export AWS_SECRET_ACCESS_KEY="$1"
          ;;
       --aws-id)
          shift
-         AWS_ACCESS_KEY_ID="$1"
+         export AWS_ACCESS_KEY_ID="$1"
          ;;
       --aws-region)
          shift
-         AWS_DEFAULT_REGION="$1"
+         export AWS_DEFAULT_REGION="$1"
          ;;
-      --nb-days)
+      --nbdays)
          shift
          NB_DAYS="$1"
          ;;
@@ -136,7 +136,7 @@ for instance in $EC2_INSTANCES; do
 
     # Analysing Last command output to check if anyone is still connected or was in the last NB_DAYS
     dbg_print "Analysing Last Connection Log..."
-    lastlog=$(ssh -o StrictHostKeyChecking=no -i $SYS_SSH $SYS_USR@$instance last -F 2>&1)
+    lastlog=$(ssh -o StrictHostKeyChecking=no -i $SYS_SSH $SYS_USR@$instance last -F 2>&1 | grep -v 'system boot')
     if [[ "$lastlog" == *"key verification failed"* ]]; then
       dbg_print "WARNING: SSH connection failed"
       break;
