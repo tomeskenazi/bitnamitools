@@ -3,7 +3,12 @@
 This repository contains one prototype script resulting of the analysis of the project given by Bitnami to support the discovery of fleet machines that are not in use anymore in the development pipeline. Alongside is provided a corresponding Jenkins job configuration file to ease the integration and the scheduling of that tool.
 
 ## Introduction
-Bitnami uses many clouds to support their development, tests, build and release strategies. The actual infrastructure, as well as development and test and other integration and release tools in use are unknown. This simplified exercise does not require in-depth knowledge of the latter and assumptions need to be addressed. As a result, several improvements could be suggested to better the script efficiency.
+Bitnami uses many clouds to support their development, tests, build and release strategies. The actual infrastructure, as well as development and test and other integration and release tools in use are unknown. This simplified exercise does not require in-depth knowledge of the latter and assumptions need to be addressed. As a result, several improvements can be suggested to better the script efficiency.
+
+### Simplified Workflow Environment Assumptions
+For this exercise, we assume a team of developers use local machines and cloud instances to develop, test and deploy their projects. Local machines are out of scope of this project. Cloud instances are used as follow:
+- Developers log onto the instances via SSH to develop, run tests, and analyse logs and various outputs
+- Developers can use those machines without interacting directly with them by using them as Jenkins slave nodes. This is optional, not all clouds instances are expected to be connected to Jenkins.
 
 ### Infrastructure
 The Infrastructure where the script will run needs to clarified.
