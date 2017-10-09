@@ -127,7 +127,7 @@ for instance in $EC2_INSTANCES; do
     # Analysing JENKINS workspace to check if any file has changed in the last NB_DAYS
     dbg_print "Analysing Jenkins Workspace..."
     lastmodified=$(ssh -o StrictHostKeyChecking=no -i $JENKINS_SSH jenkins@$instance find $JENKINSWS -ctime -$NB_DAYS 2>&1)
-     if [[ "$lastmodified" != "" ]] && [[ "$lastmodified" != *"No such file"* ]] && [[ "$lastmodified" != *"Permission denied"* ]]; then
+     if [[ "$lastmodified" != "" ]] && [[ "$lastmodified" != *"No such file"* ]] && [[ "$lastmodified" != *"Permission denied"* ]] && [[ "$lastmodified" != *"No such user"* ]]; then
       INUSE=1
       dbg_print "-> Workspace has been used recently by a Jenkins job"
       dbg_print "$lastmodified"
